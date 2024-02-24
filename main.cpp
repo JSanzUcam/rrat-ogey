@@ -112,11 +112,8 @@ int main() {
     bool rrat = false;
 
     // Main loop
-    // This is a daemon AND a virus.
-    // This program shouldn't end
-    //
-    // !!! [INFINITE LOOP INCOMING] !!!
-    while (true) {
+    bool running = true;
+    while (running) {
         // 1000ms of timeout, no events in 1 second = ENET_EVENT_TYPE_NONE
         while (enet_host_service(client, &event, 1000) > 0) {
             switch (event.type) {
@@ -160,7 +157,14 @@ int main() {
 
         // Show the menu and get the input, which is the command ID
         uint8_t userInput = showMenu();
-        SendCommand(peer, userInput);
+
+        // Do we want to exit?
+        if (userInput < 1) {
+            enet_peer_disconnect_now(peer, 0);
+            running = false;
+        } else {
+            SendCommand(peer, userInput);
+        }
     }
 
     enet_host_destroy(client);
@@ -184,11 +188,12 @@ uint8_t showMenu() {
         "3. Play a vineboom sound effect\n"
         "4. Open the presentation\n"
         "5. Change wallpaper \n"
+        "exit. Disconnects from the Demon\n"
     ;
     // The maximum command ID we can input
     const uint8_t MAX_ENTRY = 5;
 
-    uint8_t input = -1; // unsigned char -1 = 255
+    uint8_t input = 0; // Value for Exit
     bool validInput = false;
     while (!validInput) {
         // get input as a String, then parse
@@ -196,6 +201,13 @@ uint8_t showMenu() {
 
         std::cout << "Select a command: ";
         std::getline(std::cin, sinput);
+
+        // Check if it's exit
+        if (sinput == "exit") {
+            validInput = true;
+            input = 0; // we want to exit
+            continue;
+        }
 
         // Check that it's a number
         std::regex reg("^[0-9]{1,10}$");
