@@ -37,8 +37,10 @@
 
 // includes
 #include <cstdint>
+#include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <fstream>
 #include <iostream>
 #include <regex>
 #include <stdexcept>
@@ -52,6 +54,8 @@
 uint8_t showMenu();
 void SendPacket(ENetPeer* peer, const char* data);
 void SendCommand(ENetPeer* peer, uint8_t command);
+
+std::string getAddress();
 
 // main
 int main() {
@@ -87,7 +91,7 @@ int main() {
     // Set Address
     // TODO: AUTOMATE!
     // enet_address_set_host(&address, "127.0.0.1");
-    enet_address_set_host(&address, "192.168.1.162");
+    enet_address_set_host(&address, getAddress().c_str());
     address.port = 7654;
 
     peer = enet_host_connect(client, &address, 1, 0);
@@ -230,4 +234,22 @@ uint8_t showMenu() {
     }
 
     return input;
+}
+
+std::string getAddress() {
+    std::ifstream file("addr");
+
+    if (!file) {
+        std::cout << "Continuing at localhost!\n"
+            "Create an \"addr\" file and store the address there!\n";
+        return "127.0.0.1"; // Default, test
+    }
+
+    std::string line;
+    getline(file, line);
+
+    std::cout << "ADDRESS: " + line + "\n";
+
+    file.close();
+    return line;
 }
