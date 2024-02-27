@@ -49,11 +49,15 @@
 
 // ENet
 #include <enet/enet.h>
+#include <thread>
 
 // Function Prototypes
 uint8_t showMenu();
 void SendPacket(ENetPeer* peer, const char* data);
 void SendCommand(ENetPeer* peer, uint8_t command);
+
+// ENet Code here
+void runEnetLoop(ENetHost* client, ENetEvent& event, ENetPeer* peer, bool& running);
 
 std::string getAddress();
 
@@ -109,14 +113,160 @@ int main() {
 		return EXIT_SUCCESS;
 	}
 
+    // Main loop
+    bool running = true;
+
+    // Create thread
+    std::thread enetThread(runEnetLoop, client, std::ref(event), std::ref(peer), std::ref(running));
+
+    // Input Thread
+    while (running) {
+        // Show the menu and get the input, which is the command ID
+        uint8_t userInput = showMenu();
+
+        // Do we want to exit?
+        if (userInput < 1) {
+            enet_peer_disconnect_now(peer, 0);
+            running = false;
+        }
+        else if (userInput == 1) { // DEBUG
+            SendPacket(peer, "echo $USER");
+        }
+        else if (userInput == 2) { // DEBUG
+            SendPacket(peer, "sudo touch /foo.bar && ls -l /");
+        }
+        else if (userInput == 3) {
+            // CUSTOM APP OR URL
+            std::string url = "";
+            std::cout << "Introduce el Programa o URL: ";
+            std::getline(std::cin, url);
+
+            std::string msg = "xdg-open " + url;
+
+            SendPacket(peer, msg.c_str());
+        }
+        else if (userInput == 4) {
+            // CUSTOM COMMAND
+            std::string cmd = "";
+            std::cout << "Introduce el Comando: ";
+            std::getline(std::cin, cmd);
+
+            SendPacket(peer, cmd.c_str());
+        }
+        else if (userInput == 5) {
+            // SHOW PRESENTATION
+            SendPacket(peer, "xdg-open https://jsanzucam.github.io/rrat-presentation/");
+        }
+        else if (userInput == 6) {
+            // PLAY SOUND EFFECT
+            std::cout <<
+                "1. Vine Boom\n"
+                "2. Metal Pipe Sound Effect\n"
+                "3. Mondongo\n"
+                ">>> "
+            ;
+            std::string sinput;
+            uint8_t input;
+            std::getline(std::cin, sinput);
+
+            // Check that it's a number
+            std::regex reg("^[0-9]{1,10}$");
+            if (!std::regex_match(sinput, reg)) {
+                std::cout << "The input must be a whole number\n";
+                continue;
+            }
+            input = std::stoi(sinput);
+            if (input > 3 || input < 1) {
+                continue;
+            }
+
+            switch (input) {
+                case 1:
+                    {
+                        // Vine Boom
+                        std::string msg = "ffplay -v 0 -nodisp -autoexit ~/Music/vineboom.mp3";
+                        SendPacket(peer, msg.c_str());
+                    }
+                    break;
+                case 2:
+                    {
+                        // Metal Pipe
+                        std::string msg = "ffplay -v 0 -nodisp -autoexit ~/Music/pipe.mp3";
+                        SendPacket(peer, msg.c_str());
+                    }
+                    break;
+            }
+        }
+        else if (userInput == 7) {
+            // CHANGE WALLPAPER
+            std::cout <<
+                "1. YSBAG\n"
+                "2. 10thHellPrimary\n"
+                "3. yuyuedit\n"
+                "4. NUnknown\n"
+                ">>> "
+            ;
+            std::string sinput;
+            uint8_t input;
+            std::getline(std::cin, sinput);
+
+            // Check that it's a number
+            std::regex reg("^[0-9]{1,10}$");
+            if (!std::regex_match(sinput, reg)) {
+                std::cout << "The input must be a whole number\n";
+                continue;
+            }
+            input = std::stoi(sinput);
+            if (input > 4 || input < 1) {
+                continue;
+            }
+
+            switch (input) {
+                case 1:
+                    {
+                        // YSBAG
+                        std::string msg = "swww img ~/Pictures/ysbag.png";
+                        SendPacket(peer, msg.c_str());
+                    }
+                    break;
+                case 2:
+                    {
+                        // 10thHellPrimary
+                        std::string msg = "swww img ~/.wallpaper/10thHellPrimary.png";
+                        SendPacket(peer, msg.c_str());
+                    }
+                    break;
+                case 3:
+                    {
+                        // yuyuedit
+                        std::string msg = "swww img ~/.wallpaper/yuyuedit.png";
+                        SendPacket(peer, msg.c_str());
+                    }
+                    break;
+                case 4:
+                    {
+                        // NUnknown
+                        std::string msg = "swww img ~/.wallpaper/N+Unknown.png";
+                        SendPacket(peer, msg.c_str());
+                    }
+                    break;
+            }
+        }
+    }
+
+    // Wait for it to end
+    enetThread.join();
+
+    enet_host_destroy(client);
+} // main
+
+void runEnetLoop(ENetHost* client, ENetEvent& event, ENetPeer* peer, bool& running) {
     // Send an ogey
     SendPacket(peer, "ogey");
 
     // Did the server send rrat?
     bool rrat = false;
 
-    // Main loop
-    bool running = true;
     while (running) {
         // 1000ms of timeout, no events in 1 second = ENET_EVENT_TYPE_NONE
         while (enet_host_service(client, &event, 1000) > 0) {
@@ -152,27 +302,12 @@ int main() {
                     break;
 
                 case ENET_EVENT_TYPE_NONE:
-                    // Wait lmao
+                    std::cout << "AAAAAAAAA";
                     break;
             }
         }
-
-        // After waiting for a maximum of 1000ms, we get input from the user
-
-        // Show the menu and get the input, which is the command ID
-        uint8_t userInput = showMenu();
-
-        // Do we want to exit?
-        if (userInput < 1) {
-            enet_peer_disconnect_now(peer, 0);
-            running = false;
-        } else {
-            SendCommand(peer, userInput);
-        }
     }
-
-    enet_host_destroy(client);
-} // main
+}
 
 // Function definitions
 void SendPacket(ENetPeer* peer, const char* data) {
@@ -189,13 +324,15 @@ uint8_t showMenu() {
         "Available commands:\n"
         "1. [TEST] Show username of remote user\n"
         "2. [TEST] Create a foo.bar file in the root directory\n"
-        "3. Play a vineboom sound effect\n"
-        "4. Open the presentation\n"
-        "5. Change wallpaper \n"
+        "3. Custom program or URL\n"
+        "4. Custom Linux Command\n"
+        "5. Open the presentation\n"
+        "6. Play a sound effect\n"
+        "7. Change wallpaper \n"
         "exit. Disconnects from the Demon\n"
     ;
     // The maximum command ID we can input
-    const uint8_t MAX_ENTRY = 5;
+    const uint8_t MAX_ENTRY = 7;
 
     uint8_t input = 0; // Value for Exit
     bool validInput = false;
@@ -203,7 +340,7 @@ uint8_t showMenu() {
         // get input as a String, then parse
         std::string sinput;
 
-        std::cout << "Select a command: ";
+        std::cout << ">>> ";
         std::getline(std::cin, sinput);
 
         // Check if it's exit
