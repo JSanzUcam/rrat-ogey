@@ -162,7 +162,8 @@ int main() {
             std::cout <<
                 "1. Vine Boom\n"
                 "2. Metal Pipe Sound Effect\n"
-                "3. Mondongo\n"
+                "3. Metal Pipe DEEP FRIED\n"
+                "4. Mondongo\n"
                 ">>> "
             ;
             std::string sinput;
@@ -176,7 +177,7 @@ int main() {
                 continue;
             }
             input = std::stoi(sinput);
-            if (input > 3 || input < 1) {
+            if (input > 4 || input < 1) {
                 continue;
             }
 
@@ -192,6 +193,20 @@ int main() {
                     {
                         // Metal Pipe
                         std::string msg = "ffplay -v 0 -nodisp -autoexit ~/Music/pipe.mp3";
+                        SendPacket(peer, msg.c_str());
+                    }
+                    break;
+                case 3:
+                    {
+                        // Metal Pipe STRONG
+                        std::string msg = "ffplay -v 0 -nodisp -autoexit ~/Music/deepfriedpipe.mp3";
+                        SendPacket(peer, msg.c_str());
+                    }
+                    break;
+                case 4:
+                    {
+                        // Mondongo
+                        std::string msg = "ffplay -v 0 -nodisp -autoexit ~/Music/mondongo.mp3";
                         SendPacket(peer, msg.c_str());
                     }
                     break;
