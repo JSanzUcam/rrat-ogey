@@ -164,6 +164,9 @@ int main() {
                 "2. Metal Pipe Sound Effect\n"
                 "3. Metal Pipe DEEP FRIED\n"
                 "4. Mondongo\n"
+                "5. 10 years in the joint\n"
+                "6. Bring that shit Kazuma!\n"
+                "7. Kiryu-chan"
                 ">>> "
             ;
             std::string sinput;
@@ -177,7 +180,7 @@ int main() {
                 continue;
             }
             input = std::stoi(sinput);
-            if (input > 4 || input < 1) {
+            if (input > 7 || input < 1) {
                 continue;
             }
 
