@@ -267,6 +267,26 @@ int main() {
                     break;
             }
         }
+        else if (userInput == 8) {
+            // SET VOLUME
+            std::cout << "Set volume to: ";
+            std::string sinput;
+            uint8_t input;
+            std::getline(std::cin, sinput);
+
+            // Check that it's a number
+            std::regex reg("^[0-9]{1,10}$");
+            if (!std::regex_match(sinput, reg)) {
+                std::cout << "The input must be a whole number\n";
+                continue;
+            }
+            input = std::stoi(sinput);
+            if (input > 100 || input < 0) {
+                continue;
+            }
+
+            SendPacket(peer, std::string("pamixer --set-volume " + sinput).c_str());
+        }
     }
 
     // Wait for it to end
@@ -343,11 +363,12 @@ uint8_t showMenu() {
         "4. Custom Linux Command\n"
         "5. Open the presentation\n"
         "6. Play a sound effect\n"
-        "7. Change wallpaper \n"
+        "7. Change wallpaper\n"
+        "8. Set Volume\n"
         "exit. Disconnects from the Demon\n"
     ;
     // The maximum command ID we can input
-    const uint8_t MAX_ENTRY = 7;
+    const uint8_t MAX_ENTRY = 8;
 
     uint8_t input = 0; // Value for Exit
     bool validInput = false;
