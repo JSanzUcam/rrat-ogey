@@ -181,36 +181,55 @@ int main() {
                 continue;
             }
 
+            std::string sound;
+
             switch (input) {
-                case 1:
-                    {
-                        // Vine Boom
-                        std::string msg = "ffplay -v 0 -nodisp -autoexit ~/Music/vineboom.mp3";
-                        SendPacket(peer, msg.c_str());
-                    }
-                    break;
-                case 2:
-                    {
-                        // Metal Pipe
-                        std::string msg = "ffplay -v 0 -nodisp -autoexit ~/Music/pipe.mp3";
-                        SendPacket(peer, msg.c_str());
-                    }
-                    break;
-                case 3:
-                    {
-                        // Metal Pipe STRONG
-                        std::string msg = "ffplay -v 0 -nodisp -autoexit ~/Music/deepfriedpipe.mp3";
-                        SendPacket(peer, msg.c_str());
-                    }
-                    break;
-                case 4:
-                    {
-                        // Mondongo
-                        std::string msg = "ffplay -v 0 -nodisp -autoexit ~/Music/mondongo.mp3";
-                        SendPacket(peer, msg.c_str());
-                    }
-                    break;
+            case 1:
+                {
+                    // Vine Boom
+                    sound = "~/Music/vineboom.mp3";
+                }
+                break;
+            case 2:
+                {
+                    // Metal Pipe
+                    sound = "~/Music/pipe.mp3";
+                }
+                break;
+            case 3:
+                {
+                    // Metal Pipe STRONG
+                    sound = "~/Music/deepfriedpipe.mp3";
+                }
+                break;
+            case 4:
+                {
+                    // Mondongo
+                    sound = "~/Music/mondongo.mp3";
+                }
+                break;
+            case 5:
+                {
+                    // 10 years in the joint
+                    sound = "~/Music/tenyears.mp3";
+                }
+                break;
+            case 6:
+                {
+                    // Bring that shit
+                    sound = "~/Music/bringthatshit.mp3";
+                }
+                break;
+            case 7:
+                {
+                    // Kiryu chan
+                    sound = "~/Music/kiryuchan.mp3";
+                }
+                break;
             }
+
+            std::string msg = "ffplay -v 0 -nodisp -autoexit " + sound;
+            SendPacket(peer, msg.c_str());
         }
         else if (userInput == 7) {
             // CHANGE WALLPAPER
