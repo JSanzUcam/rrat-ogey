@@ -231,7 +231,7 @@ int main() {
                 break;
             }
 
-            std::string msg = "ffplay -v 0 -nodisp -autoexit " + sound;
+            std::string msg = "nohup ffplay -v 0 -nodisp -autoexit " + sound + " > /dev/null 2>&1 &";
             SendPacket(peer, msg.c_str());
         }
         else if (userInput == 7) {
